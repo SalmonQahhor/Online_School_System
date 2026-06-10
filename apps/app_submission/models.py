@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-from app_assignments.models import Assignment
+from apps.app_assignments.models import Assignment
 
 
 

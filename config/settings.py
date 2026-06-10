@@ -30,14 +30,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'app_assignments',
-    'app_submission',
+    'apps.app_assignments',
+    'apps.app_submission',
 
 
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    # 'drf_spectacular'
+   
 ]
 
 

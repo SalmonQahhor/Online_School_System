@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class AppSubmissionConfig(AppConfig):
-    name = 'app_submission'
+    name = 'apps.app_submission'
+    label = 'app_submission'

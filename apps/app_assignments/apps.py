@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class AppAssignmentsConfig(AppConfig):
-    name = 'app_assignments'
+    name = 'apps.app_assignments'
+    label = 'app_assignments'
