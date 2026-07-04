@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .env
 *.pyc
 __pycache__/
@@ -11,4 +10,4 @@ logs/
 
 media/
 staticfiles/
->>>>>>> feature/assignments-submissions
+
