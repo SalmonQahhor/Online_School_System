@@ -2,7 +2,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
-from django.shortcuts import get_object_or_404
 
 
 from .models import Group, Assignment
@@ -15,6 +14,13 @@ class GroupListCreateAPIView(GenericAPIView):
     permission_classes = [IsTeacherOrReadOnly]
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
+    
+    
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Group.objects.all()
+        return Group.objects.filter(teacher=self.request.user)
+    
     
     def get(self, request):
         group = self.get_queryset()
@@ -29,7 +35,7 @@ class GroupListCreateAPIView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
-        serializer.save()
+        serializer.save(teacher=request.user)
         
         return Response({
             "message": "Guruh yaratildi",
@@ -91,6 +97,12 @@ class AssignmentListCreateAPIView(GenericAPIView):
     queryset = Assignment.objects.all()
     
     
+    def get_queryset(self):
+        return Assignment.objects.select_related('group').filter(
+            group__teacher=self.request.user
+        )
+    
+    
     def get(self, request):
         assignments = self.get_queryset()
         serializer = self.get_serializer(assignments, many=True)
@@ -101,11 +113,14 @@ class AssignmentListCreateAPIView(GenericAPIView):
         }, status=status.HTTP_200_OK)
         
         
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        group = serializer.validated_data.get('group')
+        if group.teacher != request.user:
+            return Response({"error": "Siz bu guruh uchun vazifa yarata olmaysiz!"}, status=status.HTTP_403_FORBIDDEN)
         
+        serializer.save()
         return Response({
             "message": "Vazifa muvaffaqiyatli yaratildi",
             "data": serializer.data
@@ -119,7 +134,7 @@ class AssignmentDetailAPIView(GenericAPIView):
     lookup_field = "id"
     
     
-    def get(self, request):
+    def get(self, request, id):
         assignment = self.get_object()
         serializer = self.get_serializer(assignment)
         
@@ -131,6 +146,7 @@ class AssignmentDetailAPIView(GenericAPIView):
         
     def patch(self, request, id):
         assignment = self.get_object()
+        self.check_object_permissions(request, assignment)
         serializer = self.get_serializer(instance=assignment, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()

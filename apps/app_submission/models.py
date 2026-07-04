@@ -1,10 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from apps.app_assignments.models import Assignment
-
-
-
 
 
 
@@ -32,3 +31,20 @@ class Submission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} -> {self.assignment.title}"
+    
+    
+    def save(self, *args, **kwargs):
+       
+        if not self.id:
+            if self.assignment.deadline and self.assignment.deadline < timezone.now():
+                raise ValidationError("Kechirasiz, ushbu vazifani topshirish muddati tugagan!")
+            
+            self.status = self.Status.PENDIN
+      
+        if self.grade is not None:
+            if self.grade >= 60: 
+                self.status = self.Status.ACCEPTED
+            else:
+                self.status = self.Status.REJECTED
+        
+        super().save(*args, **kwargs)

@@ -13,11 +13,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
         
         
     def validate(self, attrs):
-        assignment = attrs.get('assignment')
-        if assignment and assignment.deadline < timezone.now():
-            raise serializers.ValidationError(
-                {"message": "Ushbu vazifani topshirish muddati yakunlangan! Kechikdingiz."}
-            )
+        if not self.instance:
+            assignment = attrs.get('assignment')
+            if assignment and assignment.deadline < timezone.now():
+                raise serializers.ValidationError(
+                    {"message": "Ushbu vazifani topshirish muddati yakunlangan! Kechikdingiz."}
+                )
             
         return attrs
 

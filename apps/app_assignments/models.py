@@ -34,3 +34,7 @@ class Assignment(models.Model):
 
 def __str__(self):
     return f"{self.title} — {self.group.name} ({self.created_at.strftime('%d.%m.%Y %H:%M')})"
+
+
+
+
